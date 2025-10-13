@@ -15,7 +15,7 @@ public class Intake {
 
     public void run(GamepadEx gp){
         if(buttonToggle){
-            buttonMode();
+            buttonMode(gp);
         } else{
            joystickMode(-gp.LEFT_STICK_Y.value());
         }
@@ -25,12 +25,14 @@ public class Intake {
         buttonToggle = !buttonToggle;
     }
 
-    public void buttonMode(){
-        if(intakeMotor.getPower() == 1){
-            intakeMotor.setPower(0);
-        } else {
-            intakeMotor.setPower(1);
-        }
+    public void buttonMode(GamepadEx gp){
+        gp.CIRCLE.onPress(() -> {
+            if(intakeMotor.getPower() == 1){
+                intakeMotor.setPower(0);
+            } else {
+                intakeMotor.setPower(1);
+            }
+        });
     }
 
     public void joystickMode(double power){

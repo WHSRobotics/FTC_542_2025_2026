@@ -7,8 +7,8 @@ import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
 @TeleOp
 public class IntakeTest extends OpModeEx {
 
-    DcMotorEx motor;
-    boolean joystick = false;
+    public DcMotorEx motor;
+    private boolean button = true;
 
     @Override
     public void initInternal() {
@@ -17,11 +17,21 @@ public class IntakeTest extends OpModeEx {
 
     @Override
     protected void loopInternal() {
-        gamepad1.CIRCLE.onPress(() -> motor.setPower(-1));
-        gamepad1.BUMPER_RIGHT.onPress(() -> joystick =! joystick);
-        if(joystick){
+        gamepad1.BUMPER_RIGHT.onPress(() -> button =! button);
+
+        if(!button){
             motor.setPower(-gamepad1.LEFT_STICK_Y.value());
-            telemetryPro.addData("motor power:", -gamepad1.LEFT_STICK_Y.value());
+        } else {
+            gamepad1.CIRCLE.onPress(() -> {
+                if(motor.getPower() == 1){
+                    motor.setPower(0);
+                } else{
+                    motor.setPower(1);
+                }
+            });
         }
+
+        telemetryPro.addData("button mode is on: ", button);
+        telemetryPro.addData("mootor power: ", motor.getPower());
     }
 }
