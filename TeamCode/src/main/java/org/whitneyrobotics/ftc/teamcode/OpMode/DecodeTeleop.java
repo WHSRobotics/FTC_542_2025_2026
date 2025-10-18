@@ -82,7 +82,7 @@ public class DecodeTeleop extends OpModeEx {
 
         //intake
         if(gamepad1.BUMPER_RIGHT.value()){robot.intake.changeMode();}
-        robot.intake.run(gamepad1);
+        robot.intake.run(gamepad2);
         telemetryPro.addData("intake using buttonmode: ", robot.intake.buttonToggle);
 
         telemetryPro.update();

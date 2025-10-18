@@ -53,8 +53,8 @@ public class OuttakeTest extends OpModeEx {
                 tL.setPower(0);
                 tR.setPower(0);
             } else {
-                tL.setPower(-1);
-                tR.setPower(1);
+                tL.setPower(1);
+                tR.setPower(-1);
             }
         });
 

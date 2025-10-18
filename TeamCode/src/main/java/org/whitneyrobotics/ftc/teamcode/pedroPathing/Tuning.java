@@ -71,6 +71,7 @@ public class Tuning extends SelectableOpMode {
                 p.add("Line", Line::new);
                 p.add("Triangle", Triangle::new);
                 p.add("Circle", Circle::new);
+                p.add("Line2", Line2::new);
             });
         });
     }
@@ -935,6 +936,8 @@ class DriveTuner extends OpMode {
  * @author Harrison Womack - 10158 Scott's Bots
  * @version 1.0, 3/12/2024
  */
+
+
 class Line extends OpMode {
     public static double DISTANCE = 40;
     private boolean forward = true;
@@ -981,6 +984,57 @@ class Line extends OpMode {
                 follower.followPath(forwards);
             }
         }
+
+        telemetryM.debug("Driving Forward?: " + forward);
+        telemetryM.update(telemetry);
+    }
+}
+
+class Line2 extends OpMode {
+    public static double DISTANCE = 40;
+    private boolean forward = true;
+
+    private Path forwards;
+    private Path backwards;
+
+    @Override
+    public void init() {}
+
+    /** This initializes the Follower and creates the forward and backward Paths. */
+    @Override
+    public void init_loop() {
+        telemetryM.debug("This will activate all the PIDF(s)");
+        telemetryM.debug("The robot will go forward and backward continuously along the path while correcting.");
+        telemetryM.debug("You can adjust the PIDF values to tune the robot's drive PIDF(s).");
+        telemetryM.update(telemetry);
+        follower.update();
+        drawOnlyCurrent();
+    }
+
+    @Override
+    public void start() {
+        follower.activateAllPIDFs();
+        forwards = new Path(new BezierLine(new Pose(0,0), new Pose(DISTANCE,0)));
+        forwards.setConstantHeadingInterpolation(0);
+        backwards = new Path(new BezierLine(new Pose(DISTANCE,0), new Pose(0,0)));
+        backwards.setConstantHeadingInterpolation(0);
+    }
+
+    /** This runs the OpMode, updating the Follower as well as printing out the debug statements to the Telemetry */
+    @Override
+    public void loop() {
+        follower.update();
+//        draw();
+//
+//        if (!follower.isBusy()) {
+//            if (forward) {
+//                forward = false;
+//                follower.followPath(backwards);
+//            } else {
+//                forward = true;
+//                follower.followPath(forwards);
+//            }
+//        }
 
         telemetryM.debug("Driving Forward?: " + forward);
         telemetryM.update(telemetry);
