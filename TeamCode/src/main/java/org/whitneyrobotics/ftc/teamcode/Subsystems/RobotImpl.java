@@ -5,6 +5,7 @@ import com.pedropathing.geometry.Pose;
 
 import org.whitneyrobotics.ftc.teamcode.Constants.Alliance;
 import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
+import org.whitneyrobotics.ftc.teamcode.Subsystems.OuttakeUnofficial;
 
 public class RobotImpl {
 
@@ -14,11 +15,13 @@ public class RobotImpl {
     //devices
     public PedroDrive drive;
     public Intake intake;
+    public OuttakeUnofficial outtake;
 
     private RobotImpl(HardwareMap hardwareMap) {
         drive = new PedroDrive(hardwareMap);
         //devices
         intake = new Intake(hardwareMap);
+        outtake = new OuttakeUnofficial(hardwareMap);
     }
 
     public void switchAlliance(){

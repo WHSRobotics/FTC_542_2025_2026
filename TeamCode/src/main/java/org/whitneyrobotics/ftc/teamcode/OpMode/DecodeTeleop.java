@@ -78,13 +78,21 @@ public class DecodeTeleop extends OpModeEx {
         telemetryPro.addData("y: ", robot.drive.getPose().getY());
         telemetryPro.addData("heading: ", robot.drive.getPose().getHeading());
 
+        // OUTTAKE (christopher):
+        gamepad1.TRIANGLE.onPress(() -> {
+            robot.outtake.transfer();
+        });
+        gamepad1.X.onPress(() -> {
+            robot.outtake.flicker();
+        });
+        gamepad1.CIRCLE.onPress(() -> {
+            robot.outtake.toggle_outtake_power();
+        });
+
         //update devices.......... :c
 
         //intake
-        if(gamepad1.BUMPER_RIGHT.value()){robot.intake.changeMode();}
         robot.intake.run(gamepad2);
-        telemetryPro.addData("intake using buttonmode: ", robot.intake.buttonToggle);
-
         telemetryPro.update();
     }
 }
