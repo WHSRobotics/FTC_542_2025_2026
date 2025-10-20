@@ -1,7 +1,11 @@
 package org.whitneyrobotics.ftc.teamcode.OpMode;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.HeadingInterpolator;
+import com.pedropathing.paths.Path;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.whitneyrobotics.ftc.teamcode.pedroPathing.Constants;
@@ -9,17 +13,26 @@ import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
 
 import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
 
+import java.util.function.Supplier;
+
 @TeleOp(name = "work pls")
 public class DemoTeleop extends OpModeEx {
 
     public boolean robotCentric = true;
     public PedroDrive drive;
     public Follower follower;
+    private Supplier<PathChain> pathChain;
 
     @Override
     public void initInternal() {
 //        drive = new PedroDrive(hardwareMap);
         follower = Constants.createFollower(hardwareMap);
+        pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
+                .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
+                .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
+                .setBrakingStart(2.5)
+                .setBrakingStrength(1)
+                .build();
     }
 
     @Override
