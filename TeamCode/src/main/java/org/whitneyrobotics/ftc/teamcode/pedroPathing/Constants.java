@@ -10,6 +10,7 @@ import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -43,7 +44,8 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorEx.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorEx.Direction.FORWARD)
             .xVelocity(64.1401)
-            .yVelocity(56.0802);
+            .yVelocity(56.0802)
+            .useBrakeModeInTeleOp(true);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 

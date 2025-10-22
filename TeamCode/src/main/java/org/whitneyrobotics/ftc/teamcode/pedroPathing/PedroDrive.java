@@ -25,13 +25,13 @@ public class PedroDrive {
 
     public void initialize(){
         follower.setStartingPose(new Pose(0,0,0));
-        follower.update();
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
-                .setBrakingStrength(1)
                 .setBrakingStart(2.5)
+                .setBrakingStrength(1)
                 .build();
+        follower.update();
     }
 
     public void startDrive(){
