@@ -22,6 +22,7 @@ public class DemoTeleop extends OpModeEx {
 
     public boolean robotCentric = true;
 //    public PedroDrive drive;
+    public double scalar = 1;
     public Follower follower;
     private Supplier<PathChain> pathChain;
 
@@ -51,8 +52,16 @@ public class DemoTeleop extends OpModeEx {
     protected void loopInternal() {
         follower.update();
         gamepad1.BUMPER_RIGHT.onPress(() -> robotCentric = !robotCentric);
-        follower.setTeleOpDrive(gamepad1.LEFT_STICK_Y.value(), -gamepad1.LEFT_STICK_X.value(), -gamepad1.RIGHT_STICK_X.value(), robotCentric);
+        follower.setTeleOpDrive(gamepad1.LEFT_STICK_Y.value() * scalar, -gamepad1.LEFT_STICK_X.value() * scalar, -gamepad1.RIGHT_STICK_X.value() * scalar, robotCentric);
         telemetryPro.addData("robotCentric: ", robotCentric);
+        gamepad1.BUMPER_LEFT.onPress(() -> {
+            if(scalar == 1){
+                scalar = 0.5;
+            } else{
+                scalar = 1;
+            }
+        });
+        telemetryPro.addData("speed scalar: ", scalar);
 //        gamepad1.BUMPER_RIGHT.onPress(() -> drive.driveMode());
 //        drive.update(gamepad1);
 //        telemetryPro.addData("robotCentric: ", drive.getDriveMode());
