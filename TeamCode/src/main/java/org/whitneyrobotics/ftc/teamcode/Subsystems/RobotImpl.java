@@ -15,13 +15,17 @@ public class RobotImpl {
     //devices
     public PedroDrive drive;
     public Intake intake;
-    public OuttakeUnofficial outtake;
+    public Transfer transfer;
+    public Outtake outtake;
+    public CompressionWheel comp;
 
     private RobotImpl(HardwareMap hardwareMap) {
         drive = new PedroDrive(hardwareMap);
         //devices
         intake = new Intake(hardwareMap);
-        outtake = new OuttakeUnofficial(hardwareMap);
+        outtake = new Outtake(hardwareMap);
+        transfer = new Transfer(hardwareMap);
+        comp = new CompressionWheel(hardwareMap);
     }
 
     public void switchAlliance(){
@@ -30,6 +34,7 @@ public class RobotImpl {
 
     public void teleOpInit(){
         Pose poseMemory = drive.getPose();
+        drive.initialize();
     }
 
     public static RobotImpl getInstance(){

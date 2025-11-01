@@ -7,23 +7,19 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
 import org.whitneyrobotics.ftc.teamcode.Extensions.TelemetryPro.LineItem;
 import org.whitneyrobotics.ftc.teamcode.Subsystems.RobotImpl;
+import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
 
 import java.util.function.UnaryOperator;
 
-@TeleOp(name = "work pls")
+@TeleOp(name = "1DecodeTeleop")
 public class DecodeTeleop extends OpModeEx {
 
     RobotImpl robot;
-    private final UnaryOperator<Float> scalingFunctionDefault = x -> (float)Math.pow(x, 3);
 
     @Override
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
         gamepad1.SQUARE.onPress(robot::switchAlliance);
-        gamepad1.START.onPress(() -> {
-            robot.drive.startDrive();
-        });
-        robot.drive.initialize();
         robot.teleOpInit();
         setupNotifications();
     }
@@ -68,31 +64,45 @@ public class DecodeTeleop extends OpModeEx {
     protected void loopInternal() {
         //drive
         gamepad1.BUMPER_RIGHT.onPress(() -> robot.drive.driveMode());
+        gamepad1.BUMPER_LEFT.onPress(() -> robot.drive.changeScalar());
         robot.drive.update(gamepad1);
-        //deal w scaling later bc im too lazy rn
-        UnaryOperator<Float> scaling = scalingFunctionDefault;
-        if(gamepad1.BUMPER_LEFT.value()) scaling = x -> x/2;
-        //add telemetry for alliance later im too lazy rn
         telemetryPro.addData("robotCentric: ", robot.drive.getDriveMode());
         telemetryPro.addData("x: ", robot.drive.getPose().getX());
         telemetryPro.addData("y: ", robot.drive.getPose().getY());
         telemetryPro.addData("heading: ", robot.drive.getPose().getHeading());
+        telemetryPro.addData("drive scalar: ", robot.drive.getScalar());
 
-        // OUTTAKE (christopher):
-        gamepad1.TRIANGLE.onPress(() -> {
-            robot.outtake.transfer();
+        //subsystems
+        //transfer
+        if(gamepad2.LEFT_TRIGGER.value()>0){
+            robot.transfer.run();
+        } else{
+            robot.transfer.stop();
+        }
+
+        //compression (on hold)
+//        if (gamepad2.CROSS.value()) {
+//            robot.comp.run();
+//        } else{
+//            robot.comp.stop();
+//        }
+
+        //intake (on hold)
+        if(gamepad2.RIGHT_TRIGGER.value()>0){
+            robot.intake.run();
+        } else{
+            robot.intake.stop();
+        }
+
+        //outtake
+        gamepad2.CIRCLE.onPress(() -> {
+            robot.outtake.run();
         });
-        gamepad1.X.onPress(() -> {
-            robot.outtake.flicker();
-        });
-        gamepad1.CIRCLE.onPress(() -> {
-            robot.outtake.toggle_outtake_power();
+        telemetryPro.addData("outtake speed: ", robot.outtake.getPower());
+        gamepad1.SQUARE.onPress(() ->{
+            robot.intake.run();
         });
 
-        //update devices.......... :c
-
-        //intake
-        robot.intake.run(gamepad2);
         telemetryPro.update();
     }
 }

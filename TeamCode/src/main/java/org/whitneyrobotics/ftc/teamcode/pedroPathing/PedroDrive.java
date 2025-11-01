@@ -12,12 +12,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.GamepadEx;
 
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public class PedroDrive {
 
     public Follower follower;
-    private boolean robotCentric = false;
-    private Supplier<PathChain> pathChain;
+    public boolean robotCentric = false;
+    public Supplier<PathChain> pathChain;
+    public double scalar = 1;
 
     public PedroDrive(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
@@ -39,8 +41,8 @@ public class PedroDrive {
     }
 
     public void update(GamepadEx gamepadEx) {
-        follower.setTeleOpDrive(gamepadEx.LEFT_STICK_Y.value(), -gamepadEx.LEFT_STICK_X.value(), -gamepadEx.RIGHT_STICK_X.value(), robotCentric);
         follower.update();
+        follower.setTeleOpDrive(gamepadEx.LEFT_STICK_Y.value() * getScalar(), -gamepadEx.LEFT_STICK_X.value() * getScalar(), -gamepadEx.RIGHT_STICK_X.value() * getScalar(), robotCentric);
     }
 
     public void driveMode(){
@@ -57,5 +59,17 @@ public class PedroDrive {
 
     public boolean isBusy(){
         return follower.isBusy();
+    }
+
+    public void changeScalar(){
+        if(scalar == 1){
+            scalar = 0.5;
+        } else{
+            scalar = 1;
+        }
+    }
+
+    public double getScalar(){
+        return scalar;
     }
 }

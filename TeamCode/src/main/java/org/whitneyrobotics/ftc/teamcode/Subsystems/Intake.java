@@ -12,13 +12,11 @@ public class Intake {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
     }
 
-    public void run(GamepadEx gp){
-        gp.CIRCLE.onPress(() -> {
-            if(intakeMotor.getPower() == 0){
-                intakeMotor.setPower(-1);
-            } else {
-                intakeMotor.setPower(0);
-            }
-        });
+    public void run() {
+        intakeMotor.setPower(1);
+    }
+
+    public void stop(){
+        intakeMotor.setPower(0);
     }
 }
