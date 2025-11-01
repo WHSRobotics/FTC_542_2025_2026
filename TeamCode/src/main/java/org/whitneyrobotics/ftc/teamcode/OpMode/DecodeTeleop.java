@@ -9,17 +9,23 @@ import org.whitneyrobotics.ftc.teamcode.Extensions.TelemetryPro.LineItem;
 import org.whitneyrobotics.ftc.teamcode.Subsystems.RobotImpl;
 import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 @TeleOp(name = "1DecodeTeleop")
 public class DecodeTeleop extends OpModeEx {
 
     RobotImpl robot;
+    private int motif;
+    private String motifTxt;
 
     @Override
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
         gamepad1.SQUARE.onPress(robot::switchAlliance);
+        motifTxt="None";
+        motif=-1;
         robot.teleOpInit();
         setupNotifications();
     }
@@ -102,7 +108,24 @@ public class DecodeTeleop extends OpModeEx {
         gamepad1.SQUARE.onPress(() ->{
             robot.intake.run();
         });
-
+        robot.ll.showAprilTags(0);
+        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
+        for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()){
+            ArrayList<Double> aprilTagValues=aprilTag.getValue();
+            telemetryPro.addData(String.format("Polar Coordinates to AprilTag %s",aprilTag.getKey()),robot.ll.getDepotValues(aprilTagValues.get(0).floatValue(),aprilTagValues.get(2).floatValue(),0));
+        }
+        if(aprilTags.containsKey(21)){
+            motif=0;
+            motifTxt="GPP";
+        }else if(aprilTags.containsKey(22)){
+            motif=1;
+            motifTxt="PGP";
+        }else if(aprilTags.containsKey(23)) {
+            motif = 2;
+            motifTxt="PPG";
+        }
+        telemetryPro.addData("Motif",motifTxt);
+        telemetryPro.addData("Motif Number",motif);
         telemetryPro.update();
     }
 }

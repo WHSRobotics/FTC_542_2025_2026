@@ -18,6 +18,7 @@ public class RobotImpl {
     public Transfer transfer;
     public Outtake outtake;
     public CompressionWheel comp;
+    public LimelightImpl ll;
 
     private RobotImpl(HardwareMap hardwareMap) {
         drive = new PedroDrive(hardwareMap);
@@ -26,6 +27,7 @@ public class RobotImpl {
         outtake = new Outtake(hardwareMap);
         transfer = new Transfer(hardwareMap);
         comp = new CompressionWheel(hardwareMap);
+        ll=new LimelightImpl(hardwareMap);
     }
 
     public void switchAlliance(){
