@@ -12,9 +12,9 @@ public class Transfer {
         tr = hardwareMap.get(CRServo.class, "tr");
     }
 
-    public void run() {
-        tl.setPower(-1);
-        tr.setPower(1);
+    public void run(double scalar) {
+        tl.setPower(-1 * scalar);
+        tr.setPower(1 * scalar);
     }
 
     public void stop(){

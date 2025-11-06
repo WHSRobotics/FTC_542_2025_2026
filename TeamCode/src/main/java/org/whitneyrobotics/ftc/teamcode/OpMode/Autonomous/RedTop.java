@@ -1,22 +1,19 @@
 package org.whitneyrobotics.ftc.teamcode.OpMode.Autonomous;
 
-import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
-import org.whitneyrobotics.ftc.teamcode.pedroPathing.Constants;
-import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name = "Blue Bottom")
-public class BlueBottom extends OpModeEx {
+import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
+import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
+
+@Autonomous(name = "RedTop")
+public class RedTop extends OpModeEx {
 
     private PedroDrive drive;
-    private Pose startPose = new Pose(65.5,16,Math.toRadians(90));
-    private Pose leavePose = new Pose(65.5,40,Math.toRadians(90));
+    private Pose startPose = new Pose(120,120,Math.toRadians(45));
+    private Pose leavePose = new Pose(84,40,Math.toRadians(90));
     private Path leave;
 
     public void buildPaths(){
@@ -25,14 +22,14 @@ public class BlueBottom extends OpModeEx {
     }
 
     @Override
-    public void initInternal() {
+    public void initInternal(){
         drive = new PedroDrive(hardwareMap);
         buildPaths();
         drive.setStartingPose(startPose);
     }
 
     @Override
-    protected void loopInternal() {
+    public void loopInternal(){
         drive.followPath(leave);
         drive.updateAuto();
     }

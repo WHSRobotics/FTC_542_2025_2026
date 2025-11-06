@@ -1,27 +1,23 @@
 package org.whitneyrobotics.ftc.teamcode.OpMode.Autonomous;
 
-import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
-import org.whitneyrobotics.ftc.teamcode.pedroPathing.Constants;
-import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-@Autonomous(name = "Blue Bottom")
-public class BlueBottom extends OpModeEx {
+import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
+import org.whitneyrobotics.ftc.teamcode.pedroPathing.PedroDrive;
+
+@Autonomous(name = "RedBottom")
+public class RedBotton extends OpModeEx {
 
     private PedroDrive drive;
-    private Pose startPose = new Pose(65.5,16,Math.toRadians(90));
-    private Pose leavePose = new Pose(65.5,40,Math.toRadians(90));
+    private Pose startPose = new Pose(78.5,16,Math.toRadians(90));
+    private Pose leavePose = new Pose(78.5,40,Math.toRadians(90));
     private Path leave;
 
     public void buildPaths(){
         leave = new Path(new BezierLine(startPose, leavePose));
-        leave.setLinearHeadingInterpolation(startPose.getHeading(), leavePose.getHeading());
     }
 
     @Override

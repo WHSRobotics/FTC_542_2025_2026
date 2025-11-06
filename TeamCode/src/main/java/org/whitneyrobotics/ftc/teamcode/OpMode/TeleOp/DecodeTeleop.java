@@ -3,6 +3,7 @@ package org.whitneyrobotics.ftc.teamcode.OpMode.TeleOp;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.endgame;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.matchEnd;
 
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
 import org.whitneyrobotics.ftc.teamcode.Extensions.TelemetryPro.LineItem;
@@ -17,15 +18,16 @@ import java.util.function.UnaryOperator;
 public class DecodeTeleop extends OpModeEx {
 
     RobotImpl robot;
-    private int motif;
-    private String motifTxt;
+//    private int motif;
+//    private String motifTxt;
 
     @Override
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
-        gamepad1.SQUARE.onPress(robot::switchAlliance);
-        motifTxt="None";
-        motif=-1;
+        robot.drive.setStartingPose(new Pose(0,0,robot.alliance.headingAngle));
+
+//        motifTxt="None";
+//        motif=-1;
         robot.teleOpInit();
         setupNotifications();
     }
@@ -73,15 +75,28 @@ public class DecodeTeleop extends OpModeEx {
         gamepad1.BUMPER_LEFT.onPress(() -> robot.drive.changeScalar());
         robot.drive.update(gamepad1);
         telemetryPro.addData("robotCentric: ", robot.drive.getDriveMode());
-        telemetryPro.addData("x: ", robot.drive.getPose().getX());
-        telemetryPro.addData("y: ", robot.drive.getPose().getY());
-        telemetryPro.addData("heading: ", robot.drive.getPose().getHeading());
+//        telemetryPro.addData("x: ", robot.drive.getPose().getX());
+//        telemetryPro.addData("y: ", robot.drive.getPose().getY());
+//        telemetryPro.addData("heading: ", robot.drive.getPose().getHeading());
         telemetryPro.addData("drive scalar: ", robot.drive.getScalar());
+        telemetryPro.addData("alliance: ", robot.alliance);
+
+        gamepad1.SQUARE.onPress(() -> {
+            robot.switchAlliance();
+            robot.drive.setStartingPose(new Pose(0,0,robot.alliance.headingAngle));
+        });
 
         //subsystems
+        //reverse
+        if(gamepad2.CROSS.value()){
+            robot.systemScalar = -1;
+        } else{
+            robot.systemScalar = 1;
+        }
+
         //transfer
         if(gamepad2.LEFT_TRIGGER.value()>0){
-            robot.transfer.run();
+            robot.transfer.run(robot.systemScalar);
         } else{
             robot.transfer.stop();
         }
@@ -95,19 +110,22 @@ public class DecodeTeleop extends OpModeEx {
 
         //intake (on hold)
         if(gamepad2.RIGHT_TRIGGER.value()>0){
-            robot.intake.run();
+            robot.intake.run(robot.systemScalar);
         } else{
             robot.intake.stop();
         }
 
         //outtake
         gamepad2.CIRCLE.onPress(() -> {
-            robot.outtake.run();
+            robot.outtake.run(robot.systemScalar);
         });
+        gamepad2.TRIANGLE.onPress(() -> {
+            robot.outtake.runSlow(robot.systemScalar);
+        });
+//        if(gamepad2.LEFT_STICK_Y.value()!=0){
+//            robot.outtake.runJoystick(gamepad2.LEFT_STICK_Y.value());
+//        }
         telemetryPro.addData("outtake speed: ", robot.outtake.getPower());
-        gamepad1.SQUARE.onPress(() ->{
-            robot.intake.run();
-        });
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
 //        for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()){

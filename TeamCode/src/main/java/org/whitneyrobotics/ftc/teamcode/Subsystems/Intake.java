@@ -12,8 +12,8 @@ public class Intake {
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
     }
 
-    public void run() {
-        intakeMotor.setPower(1);
+    public void run(double scalar) {
+        intakeMotor.setPower(1 * scalar);
     }
 
     public void stop(){

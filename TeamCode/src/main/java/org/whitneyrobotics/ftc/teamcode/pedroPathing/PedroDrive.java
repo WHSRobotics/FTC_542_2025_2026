@@ -19,14 +19,14 @@ public class PedroDrive {
     public Follower follower;
     public boolean robotCentric = false;
     public Supplier<PathChain> pathChain;
-    public double scalar = 1;
+    public double scalar = 2;
 
     public PedroDrive(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
     }
 
     public void initialize(){
-        follower.setStartingPose(new Pose(0,0,0));
+//        follower.setStartingPose(new Pose(0,0,0));
         pathChain = () -> follower.pathBuilder() //Lazy Curve Generation
                 .addPath(new Path(new BezierLine(follower::getPose, new Pose(45, 98))))
                 .setHeadingInterpolation(HeadingInterpolator.linearFromPoint(follower::getHeading, Math.toRadians(45), 0.8))
@@ -43,6 +43,10 @@ public class PedroDrive {
     public void update(GamepadEx gamepadEx) {
         follower.update();
         follower.setTeleOpDrive(gamepadEx.LEFT_STICK_Y.value() * getScalar(), -gamepadEx.LEFT_STICK_X.value() * getScalar(), -gamepadEx.RIGHT_STICK_X.value() * getScalar(), robotCentric);
+    }
+
+    public void updateAuto(){
+        follower.update();
     }
 
     public void driveMode(){
@@ -62,14 +66,22 @@ public class PedroDrive {
     }
 
     public void changeScalar(){
-        if(scalar == 1){
+        if(scalar == 2){
             scalar = 0.5;
         } else{
-            scalar = 1;
+            scalar = 2;
         }
     }
 
     public double getScalar(){
         return scalar;
+    }
+
+    public void setStartingPose(Pose startingPose){
+        follower.setStartingPose(startingPose);
+    }
+
+    public void followPath(Path path){
+        follower.followPath(path);
     }
 }
