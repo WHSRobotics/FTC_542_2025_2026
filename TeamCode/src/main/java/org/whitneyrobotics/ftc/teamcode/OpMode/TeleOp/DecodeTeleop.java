@@ -94,11 +94,17 @@ public class DecodeTeleop extends OpModeEx {
             robot.systemScalar = 1;
         }
 
-        //transfer
+        //transfer (on hold)
         if(gamepad2.LEFT_TRIGGER.value()>0){
             robot.transfer.run(robot.systemScalar);
         } else{
             robot.transfer.stop();
+        }
+
+        if(gamepad2.DPAD_UP.value()){
+            robot.transfer2.run(robot.systemScalar);
+        } else{
+            robot.transfer2.stop();
         }
 
         //compression (on hold)
@@ -119,13 +125,7 @@ public class DecodeTeleop extends OpModeEx {
         gamepad2.CIRCLE.onPress(() -> {
             robot.outtake.run(robot.systemScalar);
         });
-        gamepad2.TRIANGLE.onPress(() -> {
-            robot.outtake.runSlow(robot.systemScalar);
-        });
-//        if(gamepad2.LEFT_STICK_Y.value()!=0){
-//            robot.outtake.runJoystick(gamepad2.LEFT_STICK_Y.value());
-//        }
-        telemetryPro.addData("outtake speed: ", robot.outtake.getPower());
+        telemetryPro.addData("outtake speed: ", robot.outtake.getVelocity());
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
 //        for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()){
@@ -144,6 +144,7 @@ public class DecodeTeleop extends OpModeEx {
 //        }
 //        telemetryPro.addData("Motif",motifTxt);
 //        telemetryPro.addData("Motif Number",motif);
+        telemetryPro.addData("subsytem reverse: ", robot.systemScalar);
         telemetryPro.update();
     }
 }

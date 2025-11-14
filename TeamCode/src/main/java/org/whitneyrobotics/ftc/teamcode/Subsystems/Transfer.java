@@ -13,8 +13,8 @@ public class Transfer {
     }
 
     public void run(double scalar) {
-        tl.setPower(-1 * scalar);
-        tr.setPower(1 * scalar);
+        tl.setPower(1 * scalar);
+        tr.setPower(-1 * scalar);
     }
 
     public void stop(){

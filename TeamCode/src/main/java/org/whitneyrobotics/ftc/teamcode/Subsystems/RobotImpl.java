@@ -16,8 +16,8 @@ public class RobotImpl {
     public PedroDrive drive;
     public Intake intake;
     public Transfer transfer;
+    public Transfer2 transfer2;
     public Outtake outtake;
-    public CompressionWheel comp;
 //    public LimelightImpl ll;
     public double systemScalar = 1;
 
@@ -27,7 +27,7 @@ public class RobotImpl {
         intake = new Intake(hardwareMap);
         outtake = new Outtake(hardwareMap);
         transfer = new Transfer(hardwareMap);
-        comp = new CompressionWheel(hardwareMap);
+        transfer2 = new Transfer2(hardwareMap);
 //        ll=new LimelightImpl(hardwareMap);
     }
 

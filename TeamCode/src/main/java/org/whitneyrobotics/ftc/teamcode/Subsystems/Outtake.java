@@ -1,4 +1,5 @@
 package org.whitneyrobotics.ftc.teamcode.Subsystems;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.GamepadEx;
@@ -18,19 +19,16 @@ public class Outtake {
         }
     }
 
-    public void runSlow(double scalar){
-        if(outtakeMotor.getPower() == 0){
-            outtakeMotor.setPower(0.6 * scalar);
-        } else{
-            outtakeMotor.setPower(0);
-        }
+    public void resetEncoders(){
+        outtakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        outtakeMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
     }
 
-    public double getPower(){
-        return outtakeMotor.getPower();
+    public double getVelocity(){
+        return outtakeMotor.getVelocity();
     }
 
-    public void runJoystick(double power){
+    public void setPower(double power){
         outtakeMotor.setPower(power);
     }
 }
