@@ -11,47 +11,91 @@ import java.util.Map;
 
 public class LimelightImpl {
     Limelight3A limelight;
-    public LimelightImpl(HardwareMap hardwareMap){
-        limelight=hardwareMap.get(Limelight3A.class, "limelight");
+
+    public LimelightImpl(HardwareMap hardwareMap) {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(60);
         limelight.start();
     }
+
     //current apriltag pipeline is 0
-    public Map<Integer, ArrayList<Double>> showAprilTags(int aprilTagPipeline){
+    public Map<Integer, ArrayList<Double>> showAprilTags(int aprilTagPipeline) {
         limelight.pipelineSwitch(aprilTagPipeline);
         LLResult result = limelight.getLatestResult();
         List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-        Map<Integer, ArrayList<Double>> aprilTags=new HashMap<Integer,ArrayList<Double>>();
+        Map<Integer, ArrayList<Double>> aprilTags = new HashMap<Integer, ArrayList<Double>>();
         for (LLResultTypes.FiducialResult fiducial : fiducials) {
-            ArrayList<Double> addList=new ArrayList<Double>();
+            ArrayList<Double> addList = new ArrayList<Double>();
             addList.add(fiducial.getTargetXDegrees());
             addList.add(fiducial.getTargetYDegrees());
             addList.add(fiducial.getTargetArea());
-            aprilTags.put(fiducial.getFiducialId(),addList);
+            aprilTags.put(fiducial.getFiducialId(), addList);
         }
         return aprilTags;
     }
+
     public LLResult getColorBlobOutput(int colorPipeLine) {
         limelight.pipelineSwitch(colorPipeLine);
         LLResult result = limelight.getLatestResult();
         return result;
     }
-    public ArrayList<Float> getDepotValues(float tx, float td, float camAngle){
-        ArrayList<Float> values=new ArrayList<>();
-        float convFactor=(float) (6.33/Math.sqrt(td*307200));
-        float robotDistToDepotStraight=(float) (0.5*(240*convFactor+320*convFactor)*Math.tan(Math.toRadians(65.875)));
-        float robotDistToDepot=(float) (robotDistToDepotStraight/Math.cos(Math.toRadians(tx)));
+
+    public ArrayList<Float> getDepotValues(float tx, float ty, float td, float camAngle) {
+        ArrayList<Float> values = new ArrayList<>();
+        float convFactor = (float) (6.33 / Math.sqrt(td * 307200));
+        float robotDistToDepotStraight = (float) (0.5 * (240 * convFactor + 320 * convFactor) * Math.tan(Math.toRadians(65.875)));
+        float robotDistToDepot = (float) (robotDistToDepotStraight / Math.cos(Math.toRadians(tx)));
+        float robotDistToDepotFixed = (float) (robotDistToDepot * Math.cos(Math.toRadians(ty + camAngle)));
         values.add(tx);
-        values.add(robotDistToDepot);
+        values.add(robotDistToDepotFixed);
         return values;
     }
-    public ArrayList<Float> getDepotVector(float tx,float ty,float td,float camAngle,float camOffsetFromCenter, float camHeight){
+
+    public ArrayList<Float> getDepotVector(float tx, float ty, float td, float camAngle) {
+        ArrayList<Float> valuesToDepot=getDepotValues(tx,ty,td,camAngle);
         ArrayList<Float> values=new ArrayList<>();
-        float camDistToScore= (float) (79.1587-41*Math.log(td));
-        float robotDistToDepot= (float) (camDistToScore*Math.cos(camAngle));
-        values.add(robotDistToDepot);
-        values.add(tx+camOffsetFromCenter);
-        values.add(ty+camHeight);
+        float x=(float) (Math.cos(Math.toRadians(valuesToDepot.get(0)))*valuesToDepot.get(1));
+        float y=(float) (Math.sin(Math.toRadians(valuesToDepot.get(0)))*valuesToDepot.get(1));
+        values.add(x);
+        values.add(y);
         return values;
+    }
+
+    public float getSpeed(boolean redAlliance, float camAngle) {
+        Map<Integer, ArrayList<Double>> aprilTags=showAprilTags(0);
+        ArrayList<Double> aprilTag=new ArrayList<Double>();
+        float tx;
+        float ty;
+        float td;
+        if (redAlliance){
+            aprilTag=aprilTags.get(24);
+        }else{
+            aprilTag=aprilTags.get(24);
+        }
+        if (aprilTag.isEmpty()){
+            return -1;
+        } else {
+            tx=aprilTag.get(0).floatValue();
+            ty=aprilTag.get(1).floatValue();
+            td=aprilTag.get(2).floatValue();
+        }
+        float convFactor = (float) (6.33 / Math.sqrt(td * 307200));
+        float robotDistToDepotStraight = (float) (0.5 * (240 * convFactor + 320 * convFactor) * Math.tan(Math.toRadians(65.875)));
+        float robotDistToDepot = (float) (robotDistToDepotStraight / Math.cos(Math.toRadians(tx)));
+        float robotDistToDepotFixed = (float) (robotDistToDepot * Math.cos(Math.toRadians(ty + camAngle)));
+        float distThirdClosest = 0; //PLACEHOLDER, FILL THIS IN
+        float distSecondClosest = 0; //PLACEHOLDER, FILL THIS IN
+        float distClosest = 0; //PLACEHOLDER, FILL THIS IN
+        float speed3 = 0; //PLACEHOLDER, FILL THIS IN
+        float speed2 = 0; //PLACEHOLDER, FILL THIS IN
+        float speed1 = 0; //PLACEHOLDER, FILL THIS IN
+        if (robotDistToDepotFixed < distClosest) {
+            return speed1;
+        } else if (robotDistToDepotFixed < distSecondClosest) {
+            return speed2;
+        } else if (robotDistToDepotFixed < distThirdClosest) {
+            return speed3;
+        }
+        return -1;
     }
 }

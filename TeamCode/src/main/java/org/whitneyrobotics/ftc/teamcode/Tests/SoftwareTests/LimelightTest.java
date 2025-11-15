@@ -24,7 +24,8 @@ public class LimelightTest extends OpModeEx {
         for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()){
             ArrayList<Double> aprilTagValues=aprilTag.getValue();
             telemetryPro.addData(String.format("AprilTag %s Values", aprilTag.getKey()),aprilTagValues);
-            telemetryPro.addData(String.format("Values to AprilTag %s",aprilTag.getKey()),ll.getDepotValues(aprilTagValues.get(0).floatValue(),aprilTagValues.get(2).floatValue(),0));
+            telemetryPro.addData(String.format("Values to AprilTag %s",aprilTag.getKey()),ll.getDepotValues(aprilTagValues.get(0).floatValue(),aprilTagValues.get(1).floatValue(),aprilTagValues.get(2).floatValue(),0));
         }
+        telemetryPro.addData("Speed",ll.getSpeed(true,15));
     }
 }
