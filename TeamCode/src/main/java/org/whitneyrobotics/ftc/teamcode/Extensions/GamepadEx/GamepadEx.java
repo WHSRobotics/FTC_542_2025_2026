@@ -70,6 +70,10 @@ public class GamepadEx {
         hasError = this.gamepad == null;
     }
 
+    public void Vibrate(int duration){
+        this.gamepad.rumble(duration);
+    }
+
     public void addGenericEventListener(GamepadHardware hardware, Consumer<GamepadInteractionEvent> handler){
         hardware.onInteraction(handler);
     }

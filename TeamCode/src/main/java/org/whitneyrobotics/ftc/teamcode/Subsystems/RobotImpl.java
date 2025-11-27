@@ -19,7 +19,10 @@ public class RobotImpl {
     public Transfer2 transfer2;
     public Outtake outtake;
 //    public LimelightImpl ll;
+//    public Notifier notifier;
     public double systemScalar = 1;
+    public double targetOuttakeVelocity = 0;
+
 
     private RobotImpl(HardwareMap hardwareMap) {
         drive = new PedroDrive(hardwareMap);
@@ -29,6 +32,7 @@ public class RobotImpl {
         transfer = new Transfer(hardwareMap);
         transfer2 = new Transfer2(hardwareMap);
 //        ll=new LimelightImpl(hardwareMap);
+//        notifier = new Notifier();
     }
 
     public void switchAlliance(){

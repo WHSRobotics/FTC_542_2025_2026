@@ -4,6 +4,7 @@ import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,18 +62,18 @@ public class LimelightImpl {
         return values;
     }
 
-    public float getSpeed(boolean redAlliance, float camAngle) {
+    public double getSpeed(boolean redAlliance, float camAngle) {
         Map<Integer, ArrayList<Double>> aprilTags=showAprilTags(0);
-        ArrayList<Double> aprilTag=new ArrayList<Double>();
+        ArrayList<Double> aprilTag=new ArrayList<>();
         float tx;
         float ty;
         float td;
         if (redAlliance){
             aprilTag=aprilTags.get(24);
         }else{
-            aprilTag=aprilTags.get(24);
+            aprilTag=aprilTags.get(20);
         }
-        if (aprilTag.isEmpty()){
+        if (aprilTag==null){
             return -1;
         } else {
             tx=aprilTag.get(0).floatValue();
@@ -83,19 +84,23 @@ public class LimelightImpl {
         float robotDistToDepotStraight = (float) (0.5 * (240 * convFactor + 320 * convFactor) * Math.tan(Math.toRadians(65.875)));
         float robotDistToDepot = (float) (robotDistToDepotStraight / Math.cos(Math.toRadians(tx)));
         float robotDistToDepotFixed = (float) (robotDistToDepot * Math.cos(Math.toRadians(ty + camAngle)));
-        float distThirdClosest = 0; //PLACEHOLDER, FILL THIS IN
-        float distSecondClosest = 0; //PLACEHOLDER, FILL THIS IN
-        float distClosest = 0; //PLACEHOLDER, FILL THIS IN
-        float speed3 = 0; //PLACEHOLDER, FILL THIS IN
-        float speed2 = 0; //PLACEHOLDER, FILL THIS IN
-        float speed1 = 0; //PLACEHOLDER, FILL THIS IN
+        float farZone = 0;
+        float distThirdClosest = 69; //PLACEHOLDER, FILL THIS IN
+        float distSecondClosest = 54; //PLACEHOLDER, FILL THIS IN
+        float distClosest = 35; //PLACEHOLDER, FILL THIS IN
+        double speed4 = 1;
+        double speed3 = 0.8; //PLACEHOLDER, FILL THIS IN
+        double speed2 = 0.7; //PLACEHOLDER, FILL THIS IN
+        double speed1 = 0.6; //PLACEHOLDER, FILL THIS IN
         if (robotDistToDepotFixed < distClosest) {
             return speed1;
         } else if (robotDistToDepotFixed < distSecondClosest) {
             return speed2;
         } else if (robotDistToDepotFixed < distThirdClosest) {
             return speed3;
+        } else if(robotDistToDepotFixed < farZone){
+            return speed4;
         }
-        return -1;
+        return 1;
     }
 }

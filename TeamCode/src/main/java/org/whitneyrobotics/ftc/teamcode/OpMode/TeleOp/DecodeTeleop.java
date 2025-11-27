@@ -1,10 +1,13 @@
 package org.whitneyrobotics.ftc.teamcode.OpMode.TeleOp;
 
+import static com.sun.tools.javac.jvm.ByteCodes.error;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.endgame;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.matchEnd;
 
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.whitneyrobotics.ftc.teamcode.Constants.Alliance;
 import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
 import org.whitneyrobotics.ftc.teamcode.Extensions.TelemetryPro.LineItem;
 import org.whitneyrobotics.ftc.teamcode.Subsystems.RobotImpl;
@@ -20,6 +23,8 @@ public class DecodeTeleop extends OpModeEx {
     RobotImpl robot;
 //    private int motif;
 //    private String motifTxt;
+
+    private boolean has_rumbled = false;
 
     @Override
     public void initInternal() {
@@ -75,16 +80,14 @@ public class DecodeTeleop extends OpModeEx {
         gamepad1.BUMPER_LEFT.onPress(() -> robot.drive.changeScalar());
         robot.drive.update(gamepad1);
         telemetryPro.addData("robotCentric: ", robot.drive.getDriveMode());
-//        telemetryPro.addData("x: ", robot.drive.getPose().getX());
-//        telemetryPro.addData("y: ", robot.drive.getPose().getY());
-//        telemetryPro.addData("heading: ", robot.drive.getPose().getHeading());
         telemetryPro.addData("drive scalar: ", robot.drive.getScalar());
-        telemetryPro.addData("alliance: ", robot.alliance);
 
+        //alliance
         gamepad1.SQUARE.onPress(() -> {
             robot.switchAlliance();
             robot.drive.setStartingPose(new Pose(0,0,robot.alliance.headingAngle));
         });
+        telemetryPro.addData("alliance: ", robot.alliance);
 
         //subsystems
         //reverse
@@ -101,18 +104,12 @@ public class DecodeTeleop extends OpModeEx {
             robot.transfer.stop();
         }
 
+        //transfer2 (on hold)
         if(gamepad2.DPAD_UP.value()){
             robot.transfer2.run(robot.systemScalar);
         } else{
             robot.transfer2.stop();
         }
-
-        //compression (on hold)
-//        if (gamepad2.CROSS.value()) {
-//            robot.comp.run();
-//        } else{
-//            robot.comp.stop();
-//        }
 
         //intake (on hold)
         if(gamepad2.RIGHT_TRIGGER.value()>0){
@@ -123,9 +120,53 @@ public class DecodeTeleop extends OpModeEx {
 
         //outtake
         gamepad2.CIRCLE.onPress(() -> {
-            robot.outtake.run(robot.systemScalar);
+//            robot.outtake.power = robot.ll.getSpeed(robot.alliance == Alliance.RED,0);
+//            if(robot.outtake.power == 0.6){
+//                robot.targetOuttakeVelocity = 1390;
+//            } else if(robot.outtake.power == 0.7){
+//                robot.targetOuttakeVelocity = 1570;
+//            } else if(robot.outtake.power == 0.8){
+//                robot.targetOuttakeVelocity = 1760;
+//            } else if(robot.outtake.power == 1){
+//                robot.targetOuttakeVelocity = 2190;
+//            } else{
+//                robot.targetOuttakeVelocity = 0;
+//            }
+            robot.outtake.runVelocity(robot.systemScalar, robot.outtake.v2);
+            robot.targetOuttakeVelocity = robot.outtake.v2;
         });
+        gamepad2.TRIANGLE.onPress(() -> {
+            robot.outtake.runVelocity(robot.systemScalar, robot.outtake.v1);
+            robot.targetOuttakeVelocity = robot.outtake.v1;
+        });
+
+        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.getVelocity()) <= 20){
+            telemetryPro.addData("ReACHED", true, LineItem.Color.YELLOW, LineItem.RichTextFormat.ITALICS, LineItem.RichTextFormat.BOLD);
+            gamepad2.Vibrate(250);
+        }
+//        double error = Math.abs(robot.outtake.getVelocity() - robot.targetOuttakeVelocity);
+//        telemetryPro.addData("error: ", error);
+//        if (error< 40) {
+//            // Logic:
+//            gamepad2.Vibrate(250);
+//            has_rumbled = true;
+//            telemetryPro.addData("max reached", true);
+//        }else{
+//            has_rumbled = false;
+//        }
+//
+//        telemetryPro.addData("RUMBLED???:",has_rumbled);
+        //robot.notifier.notify_if_at_speed(gamepad2, robot.outtake.getVelocity(), robot.targetOuttakeVelocity);
+
+//        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
+//        for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()) {
+//            ArrayList<Double> aprilTagValues = aprilTag.getValue();
+//            telemetryPro.addData(String.format("AprilTag %s Values", aprilTag.getKey()), aprilTagValues);
+//            telemetryPro.addData(String.format("Values to AprilTag %s", aprilTag.getKey()), robot.ll.getDepotValues(aprilTagValues.get(0).floatValue(), aprilTagValues.get(1).floatValue(), aprilTagValues.get(2).floatValue(), 0));
+//        }
         telemetryPro.addData("outtake speed: ", robot.outtake.getVelocity());
+        telemetryPro.addData("outtake power: ", robot.outtake.power);
+
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
 //        for(Map.Entry<Integer,ArrayList<Double>> aprilTag : aprilTags.entrySet()){
@@ -143,7 +184,8 @@ public class DecodeTeleop extends OpModeEx {
 //            motifTxt="PPG";
 //        }
 //        telemetryPro.addData("Motif",motifTxt);
-//        telemetryPro.addData("Motif Number",motif);
+//        telemetryPro.addData("Motif Number",motif);`
+
         telemetryPro.addData("subsytem reverse: ", robot.systemScalar);
         telemetryPro.update();
     }

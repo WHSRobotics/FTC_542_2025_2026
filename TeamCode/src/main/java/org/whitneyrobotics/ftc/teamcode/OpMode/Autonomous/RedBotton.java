@@ -14,10 +14,12 @@ public class RedBotton extends OpModeEx {
     private PedroDrive drive;
     private Pose startPose = new Pose(78.5,16,Math.toRadians(90));
     private Pose leavePose = new Pose(78.5,40,Math.toRadians(90));
+    private Pose betterLeavePose = new Pose(120,16,Math.toRadians(90));
     private Path leave;
 
     public void buildPaths(){
-        leave = new Path(new BezierLine(startPose, leavePose));
+        leave = new Path(new BezierLine(startPose, betterLeavePose));
+        leave.setLinearHeadingInterpolation(startPose.getHeading(), leavePose.getHeading());
     }
 
     @Override
