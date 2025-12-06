@@ -76,7 +76,6 @@ public class DecodeTeleop extends OpModeEx {
     @Override
     protected void loopInternal() {
 
-        robot.outtake.update();
         //drive
         gamepad1.BUMPER_RIGHT.onPress(() -> robot.drive.driveMode());
         gamepad1.BUMPER_LEFT.onPress(() -> robot.drive.changeScalar());
@@ -138,15 +137,15 @@ public class DecodeTeleop extends OpModeEx {
 //            } else{
 //                robot.targetOuttakeVelocity = 0;
 //            }
-            robot.outtake.setTargetVelocity(robot.outtake.v2);
+            robot.outtake.run(robot.outtake.v2);
             robot.targetOuttakeVelocity = robot.outtake.v2;
         });
         gamepad2.TRIANGLE.onPress(() -> {
-            robot.outtake.runVelocity(robot.systemScalar, robot.outtake.v1);
+            robot.outtake.run(robot.outtake.v1);
             robot.targetOuttakeVelocity = robot.outtake.v1;
         });
 
-        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.getVelocity()) <= 20){
+        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.outtakeMotor.getVelocity()) <= 20){
             telemetryPro.addData("ReACHED", true, LineItem.Color.YELLOW, LineItem.RichTextFormat.ITALICS, LineItem.RichTextFormat.BOLD);
             gamepad2.Vibrate(250);
         }
@@ -170,8 +169,7 @@ public class DecodeTeleop extends OpModeEx {
 //            telemetryPro.addData(String.format("AprilTag %s Values", aprilTag.getKey()), aprilTagValues);
 //            telemetryPro.addData(String.format("Values to AprilTag %s", aprilTag.getKey()), robot.ll.getDepotValues(aprilTagValues.get(0).floatValue(), aprilTagValues.get(1).floatValue(), aprilTagValues.get(2).floatValue(), 0));
 //        }
-        telemetryPro.addData("outtake speed: ", robot.outtake.getVelocity());
-        telemetryPro.addData("outtake power: ", robot.outtake.power);
+        telemetryPro.addData("outtake speed: ", robot.outtake.outtakeMotor.getVelocity());
 
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);
