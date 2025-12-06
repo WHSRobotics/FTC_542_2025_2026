@@ -17,7 +17,7 @@ public class RobotImpl {
     public Intake intake;
     public Transfer transfer;
     public Transfer2 transfer2;
-    public Outtake outtake;
+    public OuttakePID outtake;
 //    public LimelightImpl ll;
 //    public Notifier notifier;
     public double systemScalar = 1;
@@ -28,7 +28,7 @@ public class RobotImpl {
         drive = new PedroDrive(hardwareMap);
         //devices
         intake = new Intake(hardwareMap);
-        outtake = new Outtake(hardwareMap);
+        outtake = new OuttakePID(hardwareMap);
         transfer = new Transfer(hardwareMap);
         transfer2 = new Transfer2(hardwareMap);
 //        ll=new LimelightImpl(hardwareMap);

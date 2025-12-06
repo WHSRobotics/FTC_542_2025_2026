@@ -75,6 +75,8 @@ public class DecodeTeleop extends OpModeEx {
 
     @Override
     protected void loopInternal() {
+
+        robot.outtake.update();
         //drive
         gamepad1.BUMPER_RIGHT.onPress(() -> robot.drive.driveMode());
         gamepad1.BUMPER_LEFT.onPress(() -> robot.drive.changeScalar());
@@ -98,17 +100,21 @@ public class DecodeTeleop extends OpModeEx {
         }
 
         //transfer (on hold)
-        if(gamepad2.LEFT_TRIGGER.value()>0){
+        if(gamepad2.SQUARE.value()){
             robot.transfer.run(robot.systemScalar);
-        } else{
-            robot.transfer.stop();
-        }
-
-        //transfer2 (on hold)
-        if(gamepad2.DPAD_UP.value()){
             robot.transfer2.run(robot.systemScalar);
-        } else{
-            robot.transfer2.stop();
+        }else{
+            if(gamepad2.LEFT_TRIGGER.value()>0){
+                robot.transfer.run(robot.systemScalar);
+            } else{
+                robot.transfer.stop();
+            }
+            //transfer2 (on hold)
+            if(gamepad2.DPAD_UP.value()){
+                robot.transfer2.run(robot.systemScalar);
+            } else{
+                robot.transfer2.stop();
+            }
         }
 
         //intake (on hold)
@@ -132,7 +138,7 @@ public class DecodeTeleop extends OpModeEx {
 //            } else{
 //                robot.targetOuttakeVelocity = 0;
 //            }
-            robot.outtake.runVelocity(robot.systemScalar, robot.outtake.v2);
+            robot.outtake.setTargetVelocity(robot.outtake.v2);
             robot.targetOuttakeVelocity = robot.outtake.v2;
         });
         gamepad2.TRIANGLE.onPress(() -> {

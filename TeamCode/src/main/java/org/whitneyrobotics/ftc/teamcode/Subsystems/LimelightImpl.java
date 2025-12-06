@@ -103,4 +103,29 @@ public class LimelightImpl {
         }
         return 1;
     }
+    public float getSpeedCalculated(boolean redAlliance, float camAngle, float robotHeight, float allianceHeight, float wheelRadius, float buffer){
+        Map<Integer, ArrayList<Double>> aprilTags=showAprilTags(0);
+        ArrayList<Double> aprilTag=new ArrayList<Double>();
+        float tx;
+        float ty;
+        float td;
+        if (redAlliance){
+            aprilTag=aprilTags.get(24);
+        }else{
+            aprilTag=aprilTags.get(24);
+        }
+        if (aprilTag.isEmpty()){
+            return -1;
+        } else {
+            tx=aprilTag.get(0).floatValue();
+            ty=aprilTag.get(1).floatValue();
+            td=aprilTag.get(2).floatValue();
+        }
+        float convFactor = (float) (6.33 / Math.sqrt(td * 307200));
+        float robotDistToDepotStraight = (float) (0.5 * (240 * convFactor + 320 * convFactor) * Math.tan(Math.toRadians(65.875)));
+        float robotDistToDepot = (float) (robotDistToDepotStraight / Math.cos(Math.toRadians(tx)));
+        float robotDistToDepotFixed = (float) (robotDistToDepot * Math.cos(Math.toRadians(ty + camAngle)));
+        float velocity=(float)((allianceHeight-(-4.9*Math.pow(robotDistToDepotFixed,2)+robotHeight))/robotDistToDepotFixed)/wheelRadius;
+        return velocity*buffer;
+    }
 }
