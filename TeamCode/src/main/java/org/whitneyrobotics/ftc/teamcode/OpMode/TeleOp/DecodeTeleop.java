@@ -90,7 +90,6 @@ public class DecodeTeleop extends OpModeEx {
         });
         telemetryPro.addData("alliance: ", robot.alliance);
 
-        //subsystems
         //reverse
         if(gamepad2.CROSS.value()){
             robot.systemScalar = -1;
@@ -98,23 +97,14 @@ public class DecodeTeleop extends OpModeEx {
             robot.systemScalar = 1;
         }
 
-        //transfer (on hold)
-        if(gamepad2.SQUARE.value()){
-            robot.transfer.run(robot.systemScalar);
+
+        //transfer2 (on hold)
+        if(gamepad2.DPAD_UP.value()){
             robot.transfer2.run(robot.systemScalar);
-        }else{
-            if(gamepad2.LEFT_TRIGGER.value()>0){
-                robot.transfer.run(robot.systemScalar);
-            } else{
-                robot.transfer.stop();
-            }
-            //transfer2 (on hold)
-            if(gamepad2.DPAD_UP.value()){
-                robot.transfer2.run(robot.systemScalar);
-            } else{
-                robot.transfer2.stop();
-            }
+        } else{
+            robot.transfer2.stop();
         }
+
 
         //intake (on hold)
         if(gamepad2.RIGHT_TRIGGER.value()>0){
@@ -137,12 +127,22 @@ public class DecodeTeleop extends OpModeEx {
 //            } else{
 //                robot.targetOuttakeVelocity = 0;
 //            }
-            robot.outtake.run(robot.outtake.v2);
-            robot.targetOuttakeVelocity = robot.outtake.v2;
+            if(robot.targetOuttakeVelocity==0) {
+                robot.outtake.run(robot.outtake.v2);
+                robot.targetOuttakeVelocity = robot.outtake.v2;
+            }else{
+                robot.outtake.run(0);
+                robot.targetOuttakeVelocity = 0;
+            }
         });
         gamepad2.TRIANGLE.onPress(() -> {
-            robot.outtake.run(robot.outtake.v1);
-            robot.targetOuttakeVelocity = robot.outtake.v1;
+            if(robot.targetOuttakeVelocity==0) {
+                robot.outtake.run(robot.outtake.v1);
+                robot.targetOuttakeVelocity = robot.outtake.v1;
+            }else{
+                robot.outtake.run(0);
+                robot.targetOuttakeVelocity = 0;
+            }
         });
 
         if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.outtakeMotor.getVelocity()) <= 20){
