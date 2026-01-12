@@ -128,24 +128,24 @@ public class DecodeTeleop extends OpModeEx {
 //                robot.targetOuttakeVelocity = 0;
 //            }
             if(robot.targetOuttakeVelocity==0) {
-                robot.outtake.run(robot.outtake.v2);
-                robot.targetOuttakeVelocity = robot.outtake.v2;
+                robot.outtake.setVelocity(robot.outtakev2);
+                robot.targetOuttakeVelocity = robot.outtakev2;
             }else{
-                robot.outtake.run(0);
+                robot.outtake.setVelocity(0);
                 robot.targetOuttakeVelocity = 0;
             }
         });
         gamepad2.TRIANGLE.onPress(() -> {
             if(robot.targetOuttakeVelocity==0) {
-                robot.outtake.run(robot.outtake.v1);
-                robot.targetOuttakeVelocity = robot.outtake.v1;
+                robot.outtake.setVelocity(robot.outtakev1);
+                robot.targetOuttakeVelocity = robot.outtakev1;
             }else{
-                robot.outtake.run(0);
+                robot.outtake.setVelocity(0);
                 robot.targetOuttakeVelocity = 0;
             }
         });
 
-        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.outtakeMotor.getVelocity()) <= 20){
+        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.getVelocity()) <= 20){
             telemetryPro.addData("ReACHED", true, LineItem.Color.YELLOW, LineItem.RichTextFormat.ITALICS, LineItem.RichTextFormat.BOLD);
             gamepad2.Vibrate(250);
         }
@@ -169,7 +169,7 @@ public class DecodeTeleop extends OpModeEx {
 //            telemetryPro.addData(String.format("AprilTag %s Values", aprilTag.getKey()), aprilTagValues);
 //            telemetryPro.addData(String.format("Values to AprilTag %s", aprilTag.getKey()), robot.ll.getDepotValues(aprilTagValues.get(0).floatValue(), aprilTagValues.get(1).floatValue(), aprilTagValues.get(2).floatValue(), 0));
 //        }
-        telemetryPro.addData("outtake speed: ", robot.outtake.outtakeMotor.getVelocity());
+        telemetryPro.addData("outtake speed: ", robot.outtake.getVelocity());
 
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);

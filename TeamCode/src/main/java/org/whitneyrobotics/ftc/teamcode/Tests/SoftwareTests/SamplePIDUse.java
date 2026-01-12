@@ -61,7 +61,7 @@ public class SamplePIDUse extends LinearOpMode {
 
         while (!isStopRequested()) {
             // Do your opmode stuff
-            myMotor.setVelocity(vel );
+            myMotor.setVelocity(vel);
             telemetry.addData("Velocity",myMotor.getVelocity());
             telemetry.addData("KP",kP);
             telemetry.addData("KD",kD);

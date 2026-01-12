@@ -103,6 +103,23 @@ public class LimelightImpl {
         }
         return 1;
     }
+
+    public double getShootingAngle(boolean redAlliance) {
+        Map<Integer, ArrayList<Double>> aprilTags=showAprilTags(0);
+        ArrayList<Double> aprilTag=new ArrayList<>();
+        float tx;
+        if (redAlliance){
+            aprilTag=aprilTags.get(24);
+        }else{
+            aprilTag=aprilTags.get(20);
+        }
+        if (aprilTag==null){
+            return 0;
+        } else {
+            tx=aprilTag.get(0).floatValue();
+        }
+        return tx;
+    }
     public float getSpeedCalculated(boolean redAlliance, float camAngle, float robotHeight, float allianceHeight, float wheelRadius, float buffer){
         Map<Integer, ArrayList<Double>> aprilTags=showAprilTags(0);
         ArrayList<Double> aprilTag=new ArrayList<Double>();

@@ -1,5 +1,6 @@
 package org.whitneyrobotics.ftc.teamcode.Subsystems;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.pedropathing.geometry.Pose;
 
@@ -16,9 +17,11 @@ public class RobotImpl {
     public PedroDrive drive;
     public Intake intake;
     public Transfer2 transfer2;
-    public OuttakePID outtake;
+    public DcMotorEx outtake;
 //    public LimelightImpl ll;
 //    public Notifier notifier;
+    public int outtakev1=1390;
+    public int outtakev2=1670;
     public double systemScalar = 1;
     public double targetOuttakeVelocity = 0;
 
@@ -27,7 +30,7 @@ public class RobotImpl {
         drive = new PedroDrive(hardwareMap);
         //devices
         intake = new Intake(hardwareMap);
-        outtake = new OuttakePID(hardwareMap);
+        outtake = hardwareMap.get(DcMotorEx.class, "outtake");
         transfer2 = new Transfer2(hardwareMap);
 //        ll=new LimelightImpl(hardwareMap);
 //        notifier = new Notifier();
