@@ -18,7 +18,7 @@ public class Turret {
     public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(3450, 0, 150, 0);
 
     public DcMotorEx rotate;
-    public DcMotorEx outtakeMotor;
+    public DcMotorEx outtake;
 
     private ControlConstants pidConstants;
     private PIDController pid;
@@ -26,10 +26,10 @@ public class Turret {
 
     public Turret(HardwareMap hardwareMap,double p,double i,double d){
         rotate=hardwareMap.get(DcMotorEx.class,"rotate");
-        outtakeMotor=hardwareMap.get(DcMotorEx.class,"outtakeMotor");
+        outtake=hardwareMap.get(DcMotorEx.class,"outtake");
         pidConstants = new ControlConstants(p, i, d);
         pid=new PIDController(pidConstants);
-        ll=new LimelightImpl(hardwareMap);
+//        ll=new LimelightImpl(hardwareMap);
 //        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
 //            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 //        }
@@ -50,10 +50,10 @@ public class Turret {
 //        ));
     }
     public void run(double velocity){
-        outtakeMotor.setPower(velocity);
+        outtake.setPower(velocity);
     }
     public void rotate(double power){
-        rotate.setPower(power);
+        rotate.setPower(0.008*power);
     }
     public void update(){
         double tx=ll.getShootingAngle(true);

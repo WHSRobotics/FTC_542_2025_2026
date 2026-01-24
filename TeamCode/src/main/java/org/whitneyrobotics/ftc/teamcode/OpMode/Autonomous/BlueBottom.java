@@ -13,16 +13,18 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @Autonomous(name = "Blue Bottom")
 public class BlueBottom extends OpModeEx {
     private Follower follower;
     private PedroDrive drive;
     private RobotImpl robot;
+    public DcMotorEx transfer;
 
     // Define all poses
-    private Pose startPose = new Pose(65.5, 8, Math.toRadians(90));
-    private Pose pose1 = new Pose(54, 84, Math.toRadians(130));
+    private Pose startPose = new Pose(8, 65.5, Math.toRadians(90));
+    private Pose pose1 = new Pose(84, 54, Math.toRadians(130));
     private Pose pose2 = new Pose(55, 84, Math.toRadians(180));
     private Pose pose3 = new Pose(25, 84, Math.toRadians(180));
     private Pose pose4 = new Pose(54, 84, Math.toRadians(130));
@@ -41,6 +43,13 @@ public class BlueBottom extends OpModeEx {
                 // Path 1: Start to launch position
                 .addPath(new Path(new BezierLine(startPose, pose1)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), pose1.getHeading())
+                .addParametricCallback(0.95, ()->{
+                    transfer.setPower(1);
+                    robot.intake.run(1);
+                    robot.turret.run(1);
+                    try {wait(1000);} catch (InterruptedException e) {}
+                    robot.turret.run(0);
+                })
 
                 // Path 2: Launch to specimen pickup
                 .addPath(new Path(new BezierLine(pose1, pose2)))
@@ -53,6 +62,11 @@ public class BlueBottom extends OpModeEx {
                 // Path 4: Return to launch
                 .addPath(new Path(new BezierLine(pose3, pose4)))
                 .setLinearHeadingInterpolation(pose3.getHeading(), pose4.getHeading())
+                .addParametricCallback(0.95, ()->{
+                    robot.turret.run(1);
+                    try {wait(1000);} catch (InterruptedException e) {}
+                    robot.turret.run(0);
+                })
 
                 // Path 5: Move to second specimen
                 .addPath(new Path(new BezierLine(pose4, pose5)))
@@ -65,6 +79,11 @@ public class BlueBottom extends OpModeEx {
                 // Path 7: Return to launch
                 .addPath(new Path(new BezierLine(pose6, pose7)))
                 .setLinearHeadingInterpolation(pose6.getHeading(), pose7.getHeading())
+                .addParametricCallback(0.95, ()->{
+                    robot.turret.run(1);
+                    try {wait(1000);} catch (InterruptedException e) {}
+                    robot.turret.run(0);
+                })
 
                 // Path 8: Move to third specimen
                 .addPath(new Path(new BezierLine(pose7, pose8)))
@@ -77,6 +96,11 @@ public class BlueBottom extends OpModeEx {
                 // Path 10: Final return to launch
                 .addPath(new Path(new BezierLine(pose9, pose10)))
                 .setLinearHeadingInterpolation(pose9.getHeading(), pose10.getHeading())
+                .addParametricCallback(0.95, ()->{
+                    robot.turret.run(1);
+                    try {wait(1000);} catch (InterruptedException e) {}
+                    robot.turret.run(0);
+                })
 
                 .setTranslationalConstraint(5)
                 .setTimeoutConstraint(750)
@@ -88,6 +112,7 @@ public class BlueBottom extends OpModeEx {
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
         drive = new PedroDrive(hardwareMap);
+        transfer = hardwareMap.get(DcMotorEx.class, "transfer");
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
         follower.setStartingPose(startPose);

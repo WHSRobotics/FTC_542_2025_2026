@@ -4,8 +4,10 @@ import static com.sun.tools.javac.jvm.ByteCodes.error;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.endgame;
 import static org.whitneyrobotics.ftc.teamcode.Extensions.GamepadEx.RumbleEffects.matchEnd;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import org.whitneyrobotics.ftc.teamcode.Constants.Alliance;
 import org.whitneyrobotics.ftc.teamcode.Extensions.OpModeEx.OpModeEx;
@@ -17,18 +19,24 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
+@Configurable
 @TeleOp(name = "1DecodeTeleop")
 public class DecodeTeleop extends OpModeEx {
 
     RobotImpl robot;
+    static double upPos=0.2;
+    static double downPos=0.6;
 //    private int motif;
 //    private String motifTxt;
 
     private boolean has_rumbled = false;
+    public DcMotorEx transfer;
+    public int transferTargetVelocity=0;
 
     @Override
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
+        transfer = hardwareMap.get(DcMotorEx.class, "transfer");
         robot.drive.setStartingPose(new Pose(0,0,robot.alliance.headingAngle));
 
 //        motifTxt="None";
@@ -97,15 +105,6 @@ public class DecodeTeleop extends OpModeEx {
             robot.systemScalar = 1;
         }
 
-
-        //transfer2 (on hold)
-        if(gamepad2.DPAD_UP.value()){
-            robot.transfer2.run(robot.systemScalar);
-        } else{
-            robot.transfer2.stop();
-        }
-
-
         //intake (on hold)
         if(gamepad2.RIGHT_TRIGGER.value()>0){
             robot.intake.run(robot.systemScalar);
@@ -127,25 +126,38 @@ public class DecodeTeleop extends OpModeEx {
 //            } else{
 //                robot.targetOuttakeVelocity = 0;
 //            }
-            if(robot.targetOuttakeVelocity==0) {
-                robot.outtake.setVelocity(robot.outtakev2);
+            if(robot.targetOuttakeVelocity==0){
                 robot.targetOuttakeVelocity = robot.outtakev2;
             }else{
-                robot.outtake.setVelocity(0);
                 robot.targetOuttakeVelocity = 0;
             }
         });
         gamepad2.TRIANGLE.onPress(() -> {
             if(robot.targetOuttakeVelocity==0) {
-                robot.outtake.setVelocity(robot.outtakev1);
                 robot.targetOuttakeVelocity = robot.outtakev1;
             }else{
-                robot.outtake.setVelocity(0);
                 robot.targetOuttakeVelocity = 0;
             }
         });
+        gamepad2.DPAD_UP.onPress(()->{
+            if(transferTargetVelocity==0){
+                transferTargetVelocity = 1;
+            }else{
+                transferTargetVelocity = 0;
+            }
+        });
+        gamepad2.DPAD_DOWN.onPress(()->{
+            if(transferTargetVelocity==0){
+                transferTargetVelocity = -1;
+            }else{
+                transferTargetVelocity = 0;
+            }
+        });
+        transfer.setPower(transferTargetVelocity);
+        robot.turret.run(robot.targetOuttakeVelocity);
+        robot.turret.rotate(-gamepad2.LEFT_STICK_X.value());
 
-        if(Math.abs(robot.targetOuttakeVelocity - robot.outtake.getVelocity()) <= 20){
+        if(Math.abs(robot.targetOuttakeVelocity - robot.turret.outtake.getVelocity()) <= 20){
             telemetryPro.addData("ReACHED", true, LineItem.Color.YELLOW, LineItem.RichTextFormat.ITALICS, LineItem.RichTextFormat.BOLD);
             gamepad2.Vibrate(250);
         }
@@ -169,7 +181,7 @@ public class DecodeTeleop extends OpModeEx {
 //            telemetryPro.addData(String.format("AprilTag %s Values", aprilTag.getKey()), aprilTagValues);
 //            telemetryPro.addData(String.format("Values to AprilTag %s", aprilTag.getKey()), robot.ll.getDepotValues(aprilTagValues.get(0).floatValue(), aprilTagValues.get(1).floatValue(), aprilTagValues.get(2).floatValue(), 0));
 //        }
-        telemetryPro.addData("outtake speed: ", robot.outtake.getVelocity());
+        telemetryPro.addData("outtake speed: ", robot.turret.outtake.getVelocity());
 
 //        robot.ll.showAprilTags(0);
 //        Map<Integer, ArrayList<Double>> aprilTags = robot.ll.showAprilTags(0);

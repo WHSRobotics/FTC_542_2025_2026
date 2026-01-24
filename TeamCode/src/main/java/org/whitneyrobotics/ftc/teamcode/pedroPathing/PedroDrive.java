@@ -42,7 +42,7 @@ public class PedroDrive {
 
     public void update(GamepadEx gamepadEx) {
         follower.update();
-        follower.setTeleOpDrive(gamepadEx.LEFT_STICK_Y.value() * getScalar(), -gamepadEx.LEFT_STICK_X.value() * getScalar(), -gamepadEx.RIGHT_STICK_X.value() * getScalar(), robotCentric);
+        follower.setTeleOpDrive(-gamepadEx.LEFT_STICK_X.value() * getScalar(), -gamepadEx.LEFT_STICK_Y.value() * getScalar(), -gamepadEx.RIGHT_STICK_X.value() * getScalar(), robotCentric);
     }
 
     public void updateAuto(){

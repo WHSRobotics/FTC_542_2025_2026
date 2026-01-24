@@ -26,14 +26,14 @@ public class Constants {
             .lateralZeroPowerAcceleration(-42.23239957266778);
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
-            .rightFrontMotorName("fr")
+            .rightFrontMotorName("bl")
             .rightRearMotorName("br")
-            .leftRearMotorName("bl")
+            .leftRearMotorName("fr")
             .leftFrontMotorName("fl")
             .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-            .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+            .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
-            .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .useBrakeModeInTeleOp(true)
             .xVelocity(64.17156694066806)
             .yVelocity(56.439832792507374);

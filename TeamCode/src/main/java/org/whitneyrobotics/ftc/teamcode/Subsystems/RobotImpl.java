@@ -16,12 +16,11 @@ public class RobotImpl {
     //devices
     public PedroDrive drive;
     public Intake intake;
-    public Transfer2 transfer2;
-    public DcMotorEx outtake;
+    public Turret turret;
 //    public LimelightImpl ll;
 //    public Notifier notifier;
-    public int outtakev1=1390;
-    public int outtakev2=1670;
+    public double outtakev1=1;
+    public double outtakev2=0.75;
     public double systemScalar = 1;
     public double targetOuttakeVelocity = 0;
 
@@ -30,8 +29,7 @@ public class RobotImpl {
         drive = new PedroDrive(hardwareMap);
         //devices
         intake = new Intake(hardwareMap);
-        outtake = hardwareMap.get(DcMotorEx.class, "outtake");
-        transfer2 = new Transfer2(hardwareMap);
+        turret = new Turret(hardwareMap,0.75,0,0);
 //        ll=new LimelightImpl(hardwareMap);
 //        notifier = new Notifier();
     }
