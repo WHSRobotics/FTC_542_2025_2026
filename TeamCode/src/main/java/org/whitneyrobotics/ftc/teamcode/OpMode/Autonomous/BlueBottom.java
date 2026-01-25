@@ -22,33 +22,74 @@ public class BlueBottom extends OpModeEx {
     private RobotImpl robot;
     public DcMotorEx transfer;
 
+
     // Define all poses
-    private Pose startPose = new Pose(8, 65.5, Math.toRadians(90));
-    private Pose pose1 = new Pose(84, 54, Math.toRadians(130));
-    private Pose pose2 = new Pose(55, 84, Math.toRadians(180));
-    private Pose pose3 = new Pose(25, 84, Math.toRadians(180));
-    private Pose pose4 = new Pose(54, 84, Math.toRadians(130));
-    private Pose pose5 = new Pose(55, 60, Math.toRadians(180));
-    private Pose pose6 = new Pose(25, 60, Math.toRadians(180));
-    private Pose pose7 = new Pose(54, 84, Math.toRadians(130));
-    private Pose pose8 = new Pose(55, 36, Math.toRadians(180));
-    private Pose pose9 = new Pose(25, 36, Math.toRadians(180));
-    private Pose pose10 = new Pose(54, 84, Math.toRadians(130));
+    private Pose startPose = createPose(66.5, 8, Math.toRadians(90));
+    private Pose pose1 = createPose(64, 90, Math.toRadians(134));
+    private Pose pose2 = createPose(64, 86, Math.toRadians(180));
+    private Pose pose3 = createPose(38, 86, Math.toRadians(180));
+    private Pose pose4 = createPose(54, 90, Math.toRadians(134));
+    private Pose pose5 = createPose(55, 68, Math.toRadians(180));
+    private Pose pose6 = createPose(38, 68, Math.toRadians(180));
+    private Pose pose7 = createPose(54, 90, Math.toRadians(134));
+    private Pose pose8 = createPose(55, 40, Math.toRadians(180));
+    private Pose pose9 = createPose(38, 40, Math.toRadians(180));
+    private Pose pose10 = createPose(54, 90, Math.toRadians(134));
+
+    private int currentCallback = 0;
 
     private PathChain path;
 
+
     private boolean unstarted;
+
+    public Pose createPose(double x, double y, double heading) {
+        return new Pose(y, -x, heading);
+    }
+
+    private boolean shootingInProgress = false;
+    private Timer actionTimer = new Timer();
+    private boolean needToReverse=true;
+    private void shoot(){
+        if(shootingInProgress) {
+            robot.turret.run(-1);
+
+            if (actionTimer.getElapsedTimeSeconds() >= 3) {
+                transfer.setPower(-1);
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 3.25 && needToReverse) {
+                robot.intake.run(-1);
+                needToReverse = false;
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 3.45) {
+                robot.intake.run(1);
+            }
+            if (actionTimer.getElapsedTimeSeconds()>=4.5){
+                robot.intake.run(-1);
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 5) {  // Changed to Seconds
+                robot.turret.run(-0.4);
+                transfer.setPower(0);
+                robot.intake.run(1);
+                shootingInProgress = false;
+                needToReverse = true;  // Reset for next time
+                follower.resumePathFollowing();
+            }
+        } else {
+            robot.turret.run(-0.4);
+        }
+    }
+
     public void buildPaths() {
         path = follower.pathBuilder()
                 // Path 1: Start to launch position
                 .addPath(new Path(new BezierLine(startPose, pose1)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), pose1.getHeading())
-                .addParametricCallback(0.95, ()->{
-                    transfer.setPower(1);
-                    robot.intake.run(1);
-                    robot.turret.run(1);
-                    try {wait(1000);} catch (InterruptedException e) {}
-                    robot.turret.run(0);
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {  // Only trigger if not already shooting
+                        actionTimer.resetTimer();
+                        currentCallback = 1;
+                    }
                 })
 
                 // Path 2: Launch to specimen pickup
@@ -62,10 +103,13 @@ public class BlueBottom extends OpModeEx {
                 // Path 4: Return to launch
                 .addPath(new Path(new BezierLine(pose3, pose4)))
                 .setLinearHeadingInterpolation(pose3.getHeading(), pose4.getHeading())
-                .addParametricCallback(0.95, ()->{
-                    robot.turret.run(1);
-                    try {wait(1000);} catch (InterruptedException e) {}
-                    robot.turret.run(0);
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 2;
+                    }
                 })
 
                 // Path 5: Move to second specimen
@@ -79,10 +123,13 @@ public class BlueBottom extends OpModeEx {
                 // Path 7: Return to launch
                 .addPath(new Path(new BezierLine(pose6, pose7)))
                 .setLinearHeadingInterpolation(pose6.getHeading(), pose7.getHeading())
-                .addParametricCallback(0.95, ()->{
-                    robot.turret.run(1);
-                    try {wait(1000);} catch (InterruptedException e) {}
-                    robot.turret.run(0);
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 3;
+                    }
                 })
 
                 // Path 8: Move to third specimen
@@ -96,15 +143,18 @@ public class BlueBottom extends OpModeEx {
                 // Path 10: Final return to launch
                 .addPath(new Path(new BezierLine(pose9, pose10)))
                 .setLinearHeadingInterpolation(pose9.getHeading(), pose10.getHeading())
-                .addParametricCallback(0.95, ()->{
-                    robot.turret.run(1);
-                    try {wait(1000);} catch (InterruptedException e) {}
-                    robot.turret.run(0);
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 4;
+                    }
                 })
 
                 .setTranslationalConstraint(5)
                 .setTimeoutConstraint(750)
-                .setVelocityConstraint(35)
+                .setVelocityConstraint(5)
                 .build();
     }
 
@@ -121,10 +171,23 @@ public class BlueBottom extends OpModeEx {
 
     @Override
     protected void loopInternal() {
-        follower.update();
-        if(unstarted){
-            follower.followPath(path,true);
-            unstarted=false;
+        if(!shootingInProgress) {
+            robot.intake.run(1);
         }
+        // Handle shooting action
+        shoot();
+
+        follower.update();
+
+        if (unstarted) {
+            follower.followPath(path, true);
+            unstarted = false;
+        }
+
+        telemetryPro.addData("x", follower.getPose().getX());
+        telemetryPro.addData("y", follower.getPose().getY());
+        telemetryPro.addData("Shooting", shootingInProgress);
+        telemetryPro.addData("Current Callback", currentCallback);
+        telemetryPro.addData("Timer", actionTimer.getElapsedTimeSeconds());
     }
 }

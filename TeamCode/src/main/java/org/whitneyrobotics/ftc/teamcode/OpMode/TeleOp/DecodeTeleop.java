@@ -127,28 +127,28 @@ public class DecodeTeleop extends OpModeEx {
 //                robot.targetOuttakeVelocity = 0;
 //            }
             if(robot.targetOuttakeVelocity==0){
-                robot.targetOuttakeVelocity = robot.outtakev2;
+                robot.targetOuttakeVelocity = -robot.outtakev2;
             }else{
                 robot.targetOuttakeVelocity = 0;
             }
         });
         gamepad2.TRIANGLE.onPress(() -> {
             if(robot.targetOuttakeVelocity==0) {
-                robot.targetOuttakeVelocity = robot.outtakev1;
+                robot.targetOuttakeVelocity = -robot.outtakev1;
             }else{
                 robot.targetOuttakeVelocity = 0;
             }
         });
         gamepad2.DPAD_UP.onPress(()->{
             if(transferTargetVelocity==0){
-                transferTargetVelocity = 1;
+                transferTargetVelocity = -1;
             }else{
                 transferTargetVelocity = 0;
             }
         });
         gamepad2.DPAD_DOWN.onPress(()->{
             if(transferTargetVelocity==0){
-                transferTargetVelocity = -1;
+                transferTargetVelocity = 1;
             }else{
                 transferTargetVelocity = 0;
             }

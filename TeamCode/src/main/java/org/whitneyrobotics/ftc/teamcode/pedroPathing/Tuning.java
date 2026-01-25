@@ -150,11 +150,12 @@ class LocalizationTest extends OpMode {
      */
     @Override
     public void loop() {
-        follower.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        follower.setTeleOpDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, true);
         follower.update();
 
         telemetryM.debug("x:" + follower.getPose().getX());
         telemetryM.debug("y:" + follower.getPose().getY());
+        telemetryM.debug("raw:" + follower.getPoseTracker().getRawPose());
         telemetryM.debug("heading:" + follower.getPose().getHeading());
         telemetryM.debug("total heading:" + follower.getTotalHeading());
         telemetryM.update(telemetry);
@@ -377,7 +378,7 @@ class ForwardVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(1,0,0,true);
+                follower.setTeleOpDrive(0,-1,0,true);
                 //double currentVelocity = Math.abs(follower.getVelocity().getXComponent());
                 double currentVelocity = Math.abs(follower.poseTracker.getLocalizer().getVelocity().getX());
                 velocities.add(currentVelocity);
@@ -483,7 +484,7 @@ class LateralVelocityTuner extends OpMode {
                 end = true;
                 stopRobot();
             } else {
-                follower.setTeleOpDrive(0,1,0,true);
+                follower.setTeleOpDrive(1,0,0,true);
                 double currentVelocity = Math.abs(follower.getVelocity().dot(new Vector(1, Math.PI / 2)));
                 velocities.add(currentVelocity);
                 velocities.remove(0);
@@ -556,7 +557,7 @@ class ForwardZeroPowerAccelerationTuner extends OpMode {
     public void start() {
         follower.startTeleopDrive(false);
         follower.update();
-        follower.setTeleOpDrive(1,0,0,true);
+        follower.setTeleOpDrive(0,1,0,true);
     }
 
     /**

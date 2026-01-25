@@ -20,7 +20,7 @@ public class RobotImpl {
 //    public LimelightImpl ll;
 //    public Notifier notifier;
     public double outtakev1=1;
-    public double outtakev2=0.75;
+    public double outtakev2=0.85;
     public double systemScalar = 1;
     public double targetOuttakeVelocity = 0;
 
@@ -39,7 +39,7 @@ public class RobotImpl {
     }
 
     public void teleOpInit(){
-        Pose poseMemory = drive.getPose();
+        poseMemory = drive.getPose();
         drive.initialize();
     }
 
