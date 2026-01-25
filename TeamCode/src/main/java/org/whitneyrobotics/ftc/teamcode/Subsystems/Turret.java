@@ -29,10 +29,8 @@ public class Turret {
         outtake=hardwareMap.get(DcMotorEx.class,"outtake");
         pidConstants = new ControlConstants(p, i, d);
         pid=new PIDController(pidConstants);
-//        ll=new LimelightImpl(hardwareMap);
-//        for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {
-//            module.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-//        }
+//      ll=new LimelightImpl(hardwareMap);
+//  }
 //
 //        // RUE limits max motor speed to 85% by default
 //        // Raise that limit to 100%
@@ -53,7 +51,7 @@ public class Turret {
         outtake.setPower(velocity);
     }
     public void rotate(double power){
-        rotate.setPower(0.008*power);
+        rotate.setPower(0.4*power);
     }
     public void update(){
         double tx=ll.getShootingAngle(true);

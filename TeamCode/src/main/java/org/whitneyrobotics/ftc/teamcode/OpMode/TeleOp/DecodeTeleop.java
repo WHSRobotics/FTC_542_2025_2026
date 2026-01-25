@@ -33,6 +33,7 @@ public class DecodeTeleop extends OpModeEx {
     public DcMotorEx transfer;
     public int transferTargetVelocity=0;
 
+
     @Override
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
@@ -151,6 +152,13 @@ public class DecodeTeleop extends OpModeEx {
                 transferTargetVelocity = 1;
             }else{
                 transferTargetVelocity = 0;
+            }
+        });
+        gamepad2.SQUARE.onPress(()->{
+            if(robot.targetOuttakeVelocity==0) {
+                robot.targetOuttakeVelocity = 0.5;
+            }else{
+                robot.targetOuttakeVelocity = 0;
             }
         });
         transfer.setPower(transferTargetVelocity);

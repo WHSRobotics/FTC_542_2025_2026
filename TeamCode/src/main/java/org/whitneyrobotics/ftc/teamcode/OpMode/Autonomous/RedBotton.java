@@ -13,34 +13,84 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@Autonomous(name = "RedBottom")
+@Autonomous(name = "Red Bottom")
 public class RedBotton extends OpModeEx {
     private Follower follower;
     private PedroDrive drive;
     private RobotImpl robot;
+    public DcMotorEx transfer;
 
-    // Define all poses (reflected across x=72)
-    private Pose startPose = new Pose(78.5, 8, Math.toRadians(45));
-    private Pose pose1 = new Pose(90, 84, Math.toRadians(50));
-    private Pose pose2 = new Pose(89, 84, Math.toRadians(0));
-    private Pose pose3 = new Pose(119, 84, Math.toRadians(0));
-    private Pose pose4 = new Pose(90, 84, Math.toRadians(50));
-    private Pose pose5 = new Pose(89, 60, Math.toRadians(0));
-    private Pose pose6 = new Pose(119, 60, Math.toRadians(0));
-    private Pose pose7 = new Pose(90, 84, Math.toRadians(50));
-    private Pose pose8 = new Pose(89, 36, Math.toRadians(0));
-    private Pose pose9 = new Pose(119, 36, Math.toRadians(0));
-    private Pose pose10 = new Pose(90, 84, Math.toRadians(50));
+
+    // Define all poses - reflected across x=72
+    private Pose startPose = createPose(77.5, 8, Math.toRadians(90));
+    private Pose pose1 = createPose(80, 90, Math.toRadians(46));
+    private Pose pose2 = createPose(80, 86, Math.toRadians(0));
+    private Pose pose3 = createPose(106, 86, Math.toRadians(0));
+    private Pose pose4 = createPose(90, 90, Math.toRadians(46));
+    private Pose pose5 = createPose(89, 68, Math.toRadians(0));
+    private Pose pose6 = createPose(106, 68, Math.toRadians(0));
+    private Pose pose7 = createPose(90, 90, Math.toRadians(46));
+    private Pose pose8 = createPose(89, 40, Math.toRadians(0));
+    private Pose pose9 = createPose(106, 40, Math.toRadians(0));
+    private Pose pose10 = createPose(90, 90, Math.toRadians(46));
+
+    private int currentCallback = 0;
 
     private PathChain path;
 
+
     private boolean unstarted;
+
+    public Pose createPose(double x, double y, double heading) {
+        return new Pose(y, -x, heading);
+    }
+
+    private boolean shootingInProgress = false;
+    private Timer actionTimer = new Timer();
+    private boolean needToReverse=true;
+    private void shoot(){
+        if(shootingInProgress) {
+            robot.turret.run(-1);
+
+            if (actionTimer.getElapsedTimeSeconds() >= 3) {
+                transfer.setPower(-1);
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 3.25 && needToReverse) {
+                robot.intake.run(-1);
+                needToReverse = false;
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 3.45) {
+                robot.intake.run(1);
+            }
+            if (actionTimer.getElapsedTimeSeconds()>=4.5){
+                robot.intake.run(-1);
+            }
+            if (actionTimer.getElapsedTimeSeconds() >= 5) {  // Changed to Seconds
+                robot.turret.run(-0.4);
+                transfer.setPower(0);
+                robot.intake.run(1);
+                shootingInProgress = false;
+                needToReverse = true;  // Reset for next time
+                follower.resumePathFollowing();
+            }
+        } else {
+            robot.turret.run(-0.4);
+        }
+    }
+
     public void buildPaths() {
         path = follower.pathBuilder()
                 // Path 1: Start to launch position
                 .addPath(new Path(new BezierLine(startPose, pose1)))
                 .setLinearHeadingInterpolation(startPose.getHeading(), pose1.getHeading())
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {  // Only trigger if not already shooting
+                        actionTimer.resetTimer();
+                        currentCallback = 1;
+                    }
+                })
 
                 // Path 2: Launch to specimen pickup
                 .addPath(new Path(new BezierLine(pose1, pose2)))
@@ -53,6 +103,14 @@ public class RedBotton extends OpModeEx {
                 // Path 4: Return to launch
                 .addPath(new Path(new BezierLine(pose3, pose4)))
                 .setLinearHeadingInterpolation(pose3.getHeading(), pose4.getHeading())
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 2;
+                    }
+                })
 
                 // Path 5: Move to second specimen
                 .addPath(new Path(new BezierLine(pose4, pose5)))
@@ -65,6 +123,14 @@ public class RedBotton extends OpModeEx {
                 // Path 7: Return to launch
                 .addPath(new Path(new BezierLine(pose6, pose7)))
                 .setLinearHeadingInterpolation(pose6.getHeading(), pose7.getHeading())
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 3;
+                    }
+                })
 
                 // Path 8: Move to third specimen
                 .addPath(new Path(new BezierLine(pose7, pose8)))
@@ -77,10 +143,18 @@ public class RedBotton extends OpModeEx {
                 // Path 10: Final return to launch
                 .addPath(new Path(new BezierLine(pose9, pose10)))
                 .setLinearHeadingInterpolation(pose9.getHeading(), pose10.getHeading())
+                .addParametricCallback(0.98, () -> {
+                    if (!shootingInProgress) {
+                        follower.pausePathFollowing();
+                        actionTimer.resetTimer();
+                        shootingInProgress = true;
+                        currentCallback = 4;
+                    }
+                })
 
                 .setTranslationalConstraint(5)
                 .setTimeoutConstraint(750)
-                .setVelocityConstraint(35)
+                .setVelocityConstraint(5)
                 .build();
     }
 
@@ -88,6 +162,7 @@ public class RedBotton extends OpModeEx {
     public void initInternal() {
         robot = RobotImpl.getInstance(hardwareMap);
         drive = new PedroDrive(hardwareMap);
+        transfer = hardwareMap.get(DcMotorEx.class, "transfer");
         follower = Constants.createFollower(hardwareMap);
         buildPaths();
         follower.setStartingPose(startPose);
@@ -96,10 +171,23 @@ public class RedBotton extends OpModeEx {
 
     @Override
     protected void loopInternal() {
-        follower.update();
-        if(unstarted){
-            follower.followPath(path,true);
-            unstarted=false;
+        if(!shootingInProgress) {
+            robot.intake.run(1);
         }
+        // Handle shooting action
+        shoot();
+
+        follower.update();
+
+        if (unstarted) {
+            follower.followPath(path, true);
+            unstarted = false;
+        }
+
+        telemetryPro.addData("x", follower.getPose().getX());
+        telemetryPro.addData("y", follower.getPose().getY());
+        telemetryPro.addData("Shooting", shootingInProgress);
+        telemetryPro.addData("Current Callback", currentCallback);
+        telemetryPro.addData("Timer", actionTimer.getElapsedTimeSeconds());
     }
 }
